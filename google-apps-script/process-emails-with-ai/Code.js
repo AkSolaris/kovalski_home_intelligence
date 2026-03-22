@@ -137,6 +137,15 @@ function processEmailsWithAI() {
       
     } catch (critical) { 
       console.error(`[CRITICAL ERROR] Thread "${subject}": ${critical.toString()}`); 
+      UrlFetchApp.fetch(webhookUrl, {
+        method: "post",
+        contentType: "application/json",
+        payload: JSON.stringify({ 
+          "error": true, 
+          "reason": critical.toString(),
+          "subject": subject || "Erro na busca"
+        })
+      });
     }
   }
   console.log("[FINISH] Script execution completed.");
