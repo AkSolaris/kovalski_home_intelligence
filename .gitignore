@@ -5,7 +5,14 @@ appsscript.json
 # Secrets
 .env
 keys.json
+config.example.json
 
 # System Files
 .DS_Store
 node_modules/
+
+# Home Assistant specific
+home-assistant/secrets.yaml
+home-assistant/.storage/
+home-assistant/*.db
+home-assistant/*.log

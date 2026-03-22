@@ -1,0 +1,33 @@
+# Caminho no GitHub: home-assistant/01-appointment-notification/ui_card.yaml
+type: vertical-stack
+title: "Email processing metrics"
+cards:
+  - type: horizontal-stack
+    cards:
+      - type: tile
+        entity: counter.appointments_received
+        name: "Received"
+        icon: mdi:email-sync
+        color: blue
+      - type: tile
+        entity: counter.appointments_processed
+        name: "IA OK"
+        icon: mdi:check
+        color: purple
+  - type: horizontal-stack
+    cards:
+      - type: tile
+        entity: counter.appointments_success
+        name: "On calendar"
+        color: green
+        icon: mdi:calendar-check
+      - type: tile
+        entity: counter.appointments_ignored
+        name: "Refused"
+        color: orange
+        icon: mdi:calendar-remove
+      - type: tile
+        entity: counter.appointments_failed
+        name: "Errors"
+        color: red
+        icon: mdi:alert-octagon

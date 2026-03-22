@@ -1,0 +1,68 @@
+# Caminho sugerido no GitHub: home-assistant/01-appointment-notification/automation.yaml
+alias: "Notificação: Confirmar Evento"
+description: Recebe agendamentos via Webhook com métricas de performance
+triggers:
+  - webhook_id: confirm_event_appointment
+    allowed_methods: [POST]
+    local_only: false
+    trigger: webhook
+actions:
+  - if:
+      # Verifica se o JSON chegou e se não está vazio
+      - condition: template
+        value_template: "{{ trigger.json is defined and trigger.json != {} }}"
+    then:
+      # SUCESSO TÉCNICO: Incrementa recebidos e processados
+      - action: counter.increment
+        target:
+          entity_id: 
+            - counter.appointments_received
+            - counter.appointments_processed
+
+      # Notificação Mobile (Interface)
+      - action: notify.mobile_app_super_ultra_quiquiphone
+        data:
+          title: "📅 {{ trigger.json.subject }}"
+          message: "De: {{ trigger.json.sender }}\nData: {{ trigger.json.date }}"
+          data:
+            tag: "confirmacao_evento"
+            actions:
+              - action: "CONFIRMAR_EVENTO"
+                title: "✅ Adicionar"
+              - action: "IGNORAR_EVENTO"
+                title: "❌ Ignorar"
+
+      - wait_for_trigger:
+          - event_type: mobile_app_notification_action
+            event_data: {action: CONFIRMAR_EVENTO}
+            trigger: event
+          - event_type: mobile_app_notification_action
+            event_data: {action: IGNORAR_EVENTO}
+            trigger: event
+        timeout: "01:00:00"
+
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ wait.trigger.event.data.action == 'CONFIRMAR_EVENTO' }}"
+            sequence:
+              - action: google.create_event
+                target: {entity_id: calendar.mahbraga0_gmail_com}
+                data:
+                  summary: "{{ trigger.json.subject }}"
+                  start_date_time: "{{ trigger.json.iso_start }}"
+                  end_date_time: "{{ trigger.json.iso_end }}"
+              - action: counter.increment
+                target: {entity_id: counter.appointments_success}
+
+          - conditions:
+              - condition: template
+                value_template: "{{ wait.trigger.event.data.action == 'IGNORAR_EVENTO' }}"
+            sequence:
+              - action: counter.increment
+                target: {entity_id: counter.appointments_ignored}
+    else:
+      # FALHA TÉCNICA: Webhook ativou mas o dado veio corrompido ou vazio
+      - action: counter.increment
+        target: {entity_id: counter.appointments_failed}
+mode: restart
