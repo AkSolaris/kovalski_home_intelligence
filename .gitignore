@@ -1,0 +1,11 @@
+# Google Apps Script
+.clasp.json
+appsscript.json
+
+# Secrets
+.env
+keys.json
+
+# System Files
+.DS_Store
+node_modules/
