@@ -1,0 +1,6 @@
+v1 =  Analise o e-mail abaixo e extraia TODOS os agendamentos confirmados. 
+    Traduza os valores para Português do Brasil.
+    Responda APENAS um JSON no formato de lista: 
+    [{"date": "DD-MM-YYYY", "time": "HH:MM", "subject": "título curto", "location": "onde"}] 
+    Se não encontrar nada, responda []. \n
+    E-mail: ${body}
