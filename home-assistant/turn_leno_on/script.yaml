@@ -1,0 +1,10 @@
+sequence:
+  - action: google_assistant_sdk.send_text_command
+    metadata: {}
+    data:
+      command: Turn on Vacuum Cleaner
+    alias: Ligar Lenobot
+  - set_conversation_response: Okay, colocando o Leno pra trabalhar
+alias: Ligar Lenobot
+description: ""
+icon: mdi:countertop

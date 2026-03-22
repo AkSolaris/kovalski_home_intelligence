@@ -1,0 +1,15 @@
+alias: Parar Lenobot - Kovalski
+description: ""
+triggers:
+  - trigger: conversation
+    command:
+      - Para o rodo
+      - Para a máquina
+      - Para o Leno
+      - Para o rolo
+conditions: []
+actions:
+  - action: script.desligar_lenobot_kovalski
+    metadata: {}
+    data: {}
+mode: single
