@@ -1,69 +1,81 @@
-This matches the exact structure of your KOVALSKI_HOME_INTELLIGENCE repository. I've organized it to reflect the folder names from your VS Code screenshot while keeping the technical details sharp and professional.
-🏠 Life Automation: Intelligence & Logistics
+# 🏠 Life Automation: Intelligence & Logistics
 
-A modular system to automate life logistics by extracting appointments from Gmail using Gemini 2.5 Flash AI, centralizing multiple calendar feeds, and providing real-time monitoring via Home Assistant.
-📂 Project Structure
-Plaintext
+A modular home intelligence system designed to automate logistics by mining emails via **Gemini 2.5 Flash AI**, synchronizing external calendars, and providing real-time monitoring through **Home Assistant**.
 
+## 📂 Project Structure
+
+```text
 KOVALSKI_HOME_INTELLIGENCE
 ├── google-apps-script/
-│   ├── process-emails-with-ai/            # AI-driven Gmail mining script
+│   ├── process-emails-with-ai/            # AI-driven Gmail mining engine
 │   └── centralize-all-calendars-in-one/   # Multi-source ICS feed synchronizer
 ├── home-assistant/
-│   ├── process_email_with-ai/             # Main webhook automation & notifications
-│   └── process_email_statistics/          # Counters, sensors, and dashboard metrics
+│   ├── process_email_with-ai/             # Webhook logic & mobile notifications
+│   └── process_email_statistics/          # Metrics, counters, and dashboard UI
 └── prompts/
-    └── gemini-appointments.txt            # System prompt used by the AI engine
+    └── gemini-appointments.txt            # Master prompt for the AI extraction
+```
 
-🛠️ Tech Stack
+---
 
-    Engine: Google Apps Script (V8)
+## 🛠️ Tech Stack
+- **Runtime:** Google Apps Script (V8)
+- **Intelligence:** Gemini 2.5 Flash API (LLM for data extraction)
+- **Smart Home:** Home Assistant (REST Webhooks + Mobile Push Notifications)
+- **DevOps:** [clasp](https://github.com/google/clasp) (Apps Script Management)
 
-    AI: Gemini 2.5 Flash API (Language Processing & Extraction)
+---
 
-    Smart Home: Home Assistant (REST Webhooks + Mobile Push Notifications)
+## ⚙️ Configuration (Script Properties)
 
-    Deployment: Clasp (Command Line Apps Script Projects)
+For the system to function, the following properties must be configured in the Google Apps Script project settings:
 
-⚙️ Environment Variables (Script Properties)
+### 1. Email & AI Engine
+| Property | Description |
+| :--- | :--- |
+| `API_KEY` | Google AI Studio (Gemini) API Key |
+| `WEBHOOK_URL` | Home Assistant Webhook Endpoint |
+| `EVEN_DAYS` | Office days for even weeks (e.g., `1,3,5`) |
+| `ODD_DAYS` | Office days for odd weeks (e.g., `2,4`) |
 
-Configure these in the Google Apps Script project settings for full functionality:
-1. AI & Webhook Configuration
+### 2. Calendar Synchronization
+| Property | Description |
+| :--- | :--- |
+| `ICS_URLS` | Comma-separated list of external iCal URLs (Outlook/Web) |
 
-    API_KEY: Google AI Studio API Key.
+---
 
-    WEBHOOK_URL: Home Assistant Webhook endpoint.
+## 🚀 System Logic & Data Flow
 
-    EVEN_DAYS / ODD_DAYS: Office schedule parity (e.g., 1,3,5).
+### 1. The Mining Phase
+- A time-based trigger runs `process-emails-with-ai` every 30 minutes.
+- The script searches for unread appointment-related emails.
+- Gemini AI extracts structured JSON (Subject, Date, Time, Location, Sender) using the prompt in `/prompts`.
 
-2. Calendar Sync Configuration
+### 2. The Integration Phase
+- JSON data is posted to the Home Assistant Webhook.
+- Home Assistant processes the data and increments the **Received** and **IA OK** counters.
+- A mobile notification is sent to the user with **Action Buttons** (Confirm/Ignore).
 
-    ICS_URLS: A comma-separated list of external iCal URLs (Outlook, Web feeds).
+### 3. The Execution Phase
+- **Confirm:** Triggers `google.create_event` in the primary calendar and increments the **Success** counter.
+- **Ignore:** Dismisses the notification and increments the **Ignored** counter.
+- **Failures:** Any malformed JSON or API timeout increments the **Errors** counter and logs the reason.
 
-🚀 System Data Flow
+---
 
-    Mining: Gmail trigger activates process-emails-with-ai (time-based).
+## 📊 Monitoring Dashboard
 
-    Extraction: Gemini AI processes the email body using the prompts/gemini-appointments.txt logic.
+The Home Assistant UI provides a real-time status of the pipeline:
 
-    Transmission: Validated JSON data is sent to the Home Assistant Webhook.
+- **Received:** Total webhooks successfully reached.
+- **IA OK:** Emails correctly parsed by the AI.
+- **On Calendar:** Total events you manually approved.
+- **Refused:** Events you chose to skip.
+- **Errors:** Technical failures (Empty payloads or script errors).
 
-    Interaction: Home Assistant triggers a mobile notification with Confirm/Ignore actions.
+---
 
-    Execution: - If Confirmed: Event is created in Google Calendar and success metrics are updated.
-
-        If Ignored: The event is discarded and ignore metrics are updated.
-
-    Monitoring: Dashboard cards in Home Assistant reflect real-time counts for Received, IA OK, On Calendar, Refused, and Errors.
-
-📊 Performance Monitoring
-
-The system tracks reliability across the entire pipeline:
-
-    Received: Total Webhook hits.
-
-    IA OK: Successful AI extractions.
-
-    On Calendar: Final events created by user confirmation.
-
-    Errors: Technical failures (Empty payloads, API timeouts, or invalid JSON).
+## 📝 Maintenance & Logs
+- **GAS Logs:** Detailed execution logs are available in the Google Apps Script console.
+- **HA Logs:** High-level automation failures are written to the Home Assistant `system_log`.
