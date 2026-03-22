@@ -1,0 +1,16 @@
+counter:
+  appointments_received:
+    name: "Total de Webhooks Recebidos"
+    icon: mdi:email-receive
+  appointments_processed:
+    name: "Processados com Sucesso pela IA"
+    icon: mdi:robot-check
+  appointments_success:
+    name: "Confirmados no Calendário"
+    icon: mdi:calendar-check
+  appointments_ignored:
+    name: "Eventos Ignorados por Mim"
+    icon: mdi:calendar-remove
+  appointments_failed:
+    name: "Falhas Técnicas de Processamento"
+    icon: mdi:alert-octagon
