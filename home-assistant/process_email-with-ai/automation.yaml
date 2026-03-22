@@ -1,9 +1,8 @@
 alias: "Notificação: Confirmar Evento"
-description: Recebe agendamentos via Webhook com chaves em inglês e detecção de conflitos
+description: Recebe agendamentos via Webhook com métricas de performance
 triggers:
   - webhook_id: confirm_event_appointment
-    allowed_methods:
-      - POST
+    allowed_methods: [POST]
     local_only: false
     trigger: webhook
 actions:
@@ -11,6 +10,13 @@ actions:
       - condition: template
         value_template: "{{ trigger.json is defined }}"
     then:
+      # METRICA: Recebido e Processado pela IA
+      - action: counter.increment
+        target:
+          entity_id: 
+            - counter.appointments_received
+            - counter.appointments_processed
+            
       - action: persistent_notification.create
         data:
           title: "Log: {{ trigger.json.subject }}"
@@ -68,13 +74,14 @@ actions:
                   summary: "{{ trigger.json.subject }}"
                   description: >-
                     Enviado por: {{ trigger.json.sender | default('N/A') }}
-
                     Local: {{ trigger.json.location | default('N/A') }}
-
-                    Conflitos: {{ trigger.json.conflict_details |
-                    default('Nenhum') }}
+                    Conflitos: {{ trigger.json.conflict_details | default('Nenhum') }}
                   start_date_time: "{{ trigger.json.iso_start }}"
                   end_date_time: "{{ trigger.json.iso_end }}"
+              # METRICA: Confirmado com sucesso
+              - action: counter.increment
+                target:
+                  entity_id: counter.appointments_success
               - action: notify.mobile_app_super_ultra_quiquiphone
                 data:
                   message: ✅ Evento criado com sucesso.
@@ -84,12 +91,20 @@ actions:
               - condition: template
                 value_template: "{{ wait.trigger.event.data.action == 'IGNORAR_EVENTO' }}"
             sequence:
+              # METRICA: Ignorado pelo usuário
+              - action: counter.increment
+                target:
+                  entity_id: counter.appointments_ignored
               - action: notify.mobile_app_super_ultra_quiquiphone
                 data:
                   message: ❌ Evento ignorado.
                   data:
                     tag: confirmacao_evento
     else:
+      # METRICA: Falha técnica (Webhook sem JSON)
+      - action: counter.increment
+        target:
+          entity_id: counter.appointments_failed
       - action: system_log.write
         data:
           level: warning
