@@ -5,6 +5,7 @@ appsscript.json
 # Secrets
 .env
 keys.json
+config.example.json
 
 # System Files
 .DS_Store
