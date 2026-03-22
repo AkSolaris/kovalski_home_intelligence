@@ -1,0 +1,97 @@
+alias: "Notificação: Confirmar Evento"
+description: Recebe agendamentos via Webhook com chaves em inglês e detecção de conflitos
+triggers:
+  - webhook_id: confirm_event_appointment
+    allowed_methods:
+      - POST
+    local_only: false
+    trigger: webhook
+actions:
+  - if:
+      - condition: template
+        value_template: "{{ trigger.json is defined }}"
+    then:
+      - action: persistent_notification.create
+        data:
+          title: "Log: {{ trigger.json.subject }}"
+          message: "Conflitos: {{ trigger.json.conflict_details | default('Nenhum') }}"
+          notification_id: ultimo_evento_log
+      - action: notify.mobile_app_super_ultra_quiquiphone
+        data:
+          title: 📅 {{ trigger.json.subject }}
+          message: |-
+            • De: {{ trigger.json.sender | default('Desconhecido') }}
+            • Dia: {{ trigger.json.weekday_name }}
+            • Data: {{ trigger.json.date | replace('-', ' de ') }}
+            • Hora: {{ trigger.json.time | replace(':', ' e ') }}
+            • Local: {{ trigger.json.location | default('Não informado') }}
+            {% if trigger.json.is_office_day or trigger.json.has_conflict %}
+            ━━━━━━━━━━━━━━
+            {%- endif %}
+            {%- if trigger.json.is_office_day %}
+            🚨 Atenção, é em dia de escritório
+            {%- endif %}
+            {%- if trigger.json.has_conflict %}
+            ⚠️ Conflito evento próx.:
+            - {{ trigger.json.conflict_details | replace(', ', '\n- ') }}
+            {%- endif %}
+          data:
+            tag: confirmacao_evento
+            color: >-
+              {% if trigger.json.has_conflict or trigger.json.is_office_day
+              %}red{% else %}blue{% endif %}
+            actions:
+              - action: CONFIRMAR_EVENTO
+                title: ✅ Adicionar
+              - action: IGNORAR_EVENTO
+                title: ❌ Ignorar
+      - wait_for_trigger:
+          - event_type: mobile_app_notification_action
+            event_data:
+              action: CONFIRMAR_EVENTO
+            trigger: event
+          - event_type: mobile_app_notification_action
+            event_data:
+              action: IGNORAR_EVENTO
+            trigger: event
+        timeout: "01:00:00"
+        continue_on_timeout: false
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ wait.trigger.event.data.action == 'CONFIRMAR_EVENTO' }}"
+            sequence:
+              - action: google.create_event
+                target:
+                  entity_id: calendar.mahbraga0_gmail_com
+                data:
+                  summary: "{{ trigger.json.subject }}"
+                  description: >-
+                    Enviado por: {{ trigger.json.sender | default('N/A') }}
+
+                    Local: {{ trigger.json.location | default('N/A') }}
+
+                    Conflitos: {{ trigger.json.conflict_details |
+                    default('Nenhum') }}
+                  start_date_time: "{{ trigger.json.iso_start }}"
+                  end_date_time: "{{ trigger.json.iso_end }}"
+              - action: notify.mobile_app_super_ultra_quiquiphone
+                data:
+                  message: ✅ Evento criado com sucesso.
+                  data:
+                    tag: confirmacao_evento
+          - conditions:
+              - condition: template
+                value_template: "{{ wait.trigger.event.data.action == 'IGNORAR_EVENTO' }}"
+            sequence:
+              - action: notify.mobile_app_super_ultra_quiquiphone
+                data:
+                  message: ❌ Evento ignorado.
+                  data:
+                    tag: confirmacao_evento
+    else:
+      - action: system_log.write
+        data:
+          level: warning
+          message: Webhook recebido sem dados JSON.
+mode: restart
