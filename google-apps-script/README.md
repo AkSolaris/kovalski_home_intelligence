@@ -1,6 +1,6 @@
 # 🛠️ Google Apps Scripts Catalog
 
-| Projeto | Descrição | Status |
+| Project | Descrption | Status |
 | :--- | :--- | :--- |
-| [01-Appointment](./01-appointment-processor) | Extrai aulas e consultas do Gmail | ✅ Estável |
-| [02-Outro](./02-outro-projeto) | Descrição curta aqui | 🏗️ Em desenvolvimento |
+| [Email processing for calendar](./gprocess-emails-with-ai) | Extracts appointments with gmail | ✅ Stable |
+| [Calendar centralization](./centralize-all-calendars-in-one) | Gathers the ICS links from all emails and gathers it all in one calendar | ✅ Stable |
