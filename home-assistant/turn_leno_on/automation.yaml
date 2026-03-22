@@ -1,0 +1,23 @@
+alias: Ligar Lenobot - Kovalski
+description: ""
+triggers:
+  - trigger: conversation
+    command:
+      - passa o rodo
+      - faça o rodo
+      - passa o rolo
+      - faça o rolo
+      - liga o leno
+conditions: []
+actions:
+  - action: script.ligar_lenobot
+    metadata: {}
+    data: {}
+  - action: tts.speak
+    target:
+      entity_id: tts.piper
+    data:
+      cache: false
+      media_player_entity_id: media_player.nestmini3840
+      message: Entendido! O Leno já está passando o rodo.
+mode: single

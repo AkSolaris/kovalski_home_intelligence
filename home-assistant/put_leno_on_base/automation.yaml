@@ -1,0 +1,13 @@
+alias: Colocar Leno na base - Kovalski
+description: ""
+triggers:
+  - trigger: conversation
+    command:
+      - de volta à base
+      - volta ele pra base
+conditions: []
+actions:
+  - action: script.colocar_leno_na_base_kovalski
+    metadata: {}
+    data: {}
+mode: single

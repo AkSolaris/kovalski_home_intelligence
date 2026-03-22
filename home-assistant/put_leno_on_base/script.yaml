@@ -1,0 +1,9 @@
+sequence:
+  - action: google_assistant_sdk.send_text_command
+    metadata: {}
+    data:
+      command: Put vacuum cleaner back on its base
+  - set_conversation_response: Okay, colocando de volta na base
+alias: Colocar Leno na base - Kovalski
+description: ""
+icon: mdi:fridge

@@ -1,0 +1,9 @@
+sequence:
+  - action: google_assistant_sdk.send_text_command
+    metadata: {}
+    data:
+      command: Turn off Vacuum cleaner
+  - set_conversation_response: Desligando o Leninho
+alias: Desligar Lenobot - Kovalski
+description: ""
+icon: mdi:robot-dead
