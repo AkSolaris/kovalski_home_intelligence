@@ -1,0 +1,29 @@
+alias: "Webhook: Receber Rastreio do Gmail"
+description: Recebe dados do Google Script e força atualização do sensor
+triggers:
+  - webhook_id: inject_tracking_code
+    allowed_methods:
+      - POST
+    local_only: false
+    trigger: webhook
+actions:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.json.codigo_rastreio is defined }}"
+        sequence:
+          - action: seventeentrack.add_package
+            data:
+              config_entry_id: 17TRACKING_ENTRY_CONFIG_ID
+              package_tracking_number: "{{ trigger.json.codigo_rastreio }}"
+              package_friendly_name: "{{ trigger.json.nome_produto }}"
+          - delay: "00:00:05" # 5 second delay for 17track to not gasp
+          - event: force_17track_update
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.json.type == 'error' }}"
+        sequence:
+          - action: notify.super_ultra_quiquiphone
+            data:
+              title: ⚠️ Erro no Script de Rastreio
+              message: "Erro: {{ trigger.json.message }} em {{ trigger.json.context }}"
