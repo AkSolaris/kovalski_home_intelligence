@@ -1,0 +1,64 @@
+type: markdown
+title: 📦 Rastreios Ativos
+content: >-
+  {% set tudo = state_attr('sensor.meus_rastreios_detalhados', 'lista') %}
+
+  {% if tudo %}
+
+  {%- for pkg in tudo -%}
+
+  {%- set status = pkg.get('status') or 'Unknown' -%}
+
+  {%- set update = pkg.get('timestamp') -%}
+
+  {%- set data = as_timestamp(update) | timestamp_custom('%d/%m', true) if
+  update else '--/--' -%}
+
+  {%- set check_time =
+  as_timestamp(states.sensor.meus_rastreios_detalhados.last_updated |
+  default(now())) | timestamp_custom('%H:%M') -%}
+
+  {%- set info = (pkg.get('info_text') or '') | lower -%}
+
+  {%- set loc = pkg.get('location') or 'N/A' -%}
+
+  {%- if 'flight' in info or 'international' in info -%}
+
+  {%- set dyn_icon = '✈️' -%}
+
+  {%- elif 'delivery' in info or 'bezorging' in info or 'entrega' in info -%}
+
+  {%- set dyn_icon = '🚗' -%}
+
+  {%- elif 'sorting' in info or 'facility' in info or 'processing' in info -%}
+
+  {%- set dyn_icon = '📦' -%}
+
+  {%- else -%}
+
+  {%- set dyn_icon = '📦' -%}
+
+  {%- endif -%}
+
+
+  > **+ {{ pkg.get('friendly_name') or "Pacote sem nome" }}**
+
+  > `{{ pkg.get('tracking_number') }}` | **`{{ status | upper }}`**
+
+  > **`📅 {{ data }} às {{ check_time }} `**
+
+  >
+
+  > {{ dyn_icon }} {{ pkg.get('info_text') or 'Aguardando atualização...' }} |
+  Local: {{ loc }}
+
+
+  --- {{ '\n' }}
+
+  {%- endfor -%}
+
+  {% else %}
+
+  Nenhum pacote detectado no momento. 🧘‍♀️
+
+  {% endif %}
