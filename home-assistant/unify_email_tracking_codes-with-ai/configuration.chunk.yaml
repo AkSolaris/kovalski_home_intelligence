@@ -1,0 +1,20 @@
+# 17 track template for integration with the panel
+template:
+  - trigger:
+      - trigger: time_pattern
+        hours: "/1" # Also updates every 1 hr
+      - trigger: homeassistant
+        event: start # Initualizes when HA starts
+      - trigger: event
+        event_type: "force_17track_update" # The event to listen to, so the widget updates when this event is emitted
+    action:
+      - action: seventeentrack.get_packages
+        data:
+          config_entry_id: !secret 17track_api_id # 17track integration ID
+        response_variable: resposta_api
+    sensor:
+      - name: "Meus Rastreios Detalhados"
+        unique_id: meus_rastreios_detalhados
+        state: "{{ resposta_api['packages'] | length }}"
+        attributes:
+          lista: "{{ resposta_api['packages'] }}"
