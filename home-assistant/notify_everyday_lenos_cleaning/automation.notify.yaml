@@ -1,0 +1,16 @@
+alias: "LEno: Ativar?"
+description: "Manda notificação para dispositivos todo dia às 20h "
+triggers:
+  - at: "20:00:00"
+    trigger: time
+actions:
+  - action: notify.notify
+    data:
+      title: 🤖 LEno
+      message: Posso começar a limpeza agora?
+      data:
+        actions:
+          - action: ATIVAR_ROOMBA
+            title: Sim, por favor
+          - action: CANCELAR_ROOMBA
+            title: Agora não

@@ -1,0 +1,11 @@
+alias: "Roomba: Executa se Confirmado"
+description: Executa o comando de ativação do LEnobot se a confirmação for recebida
+triggers:
+  - event_type: mobile_app_notification_action
+    event_data:
+      action: ATIVAR_ROOMBA
+    trigger: event
+actions:
+  - action: script.turn_on
+    target:
+      entity_id: script.ligar_lenobot
