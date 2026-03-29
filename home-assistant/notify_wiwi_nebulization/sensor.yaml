@@ -1,12 +1,15 @@
-alias: "Nível De risco wiwi"
-id: nivel_de_risco_wiwi
-{% set h = states('sensor.umidade_sala') | float(50) %}
-{% set pm = states('sensor.qualidade_ar_pm25') | float(0) %}
-{% set t = states('sensor.temperatura_sala') | float(20) %}
+{% set temp = states('sensor.asterstraat_geleen_temperature') | float(20) %}
+{% set humidity = states('sensor.asterstraat_geleen_humidity') | float(50) %}
 
-{% if h < 30 or pm > 35 or t < 16 %}
+{# Substitua pelo ID real que você achou no Passo 1 #}
+{% set pm25 = states('sensor.asterstraat_geleen_pm2_5') | float(0) %}
+{% set o3 = states('sensor.asterstraat_geleen_ozone') | float(0) %}
+
+{# LÓGICA CRÍTICA: Frio extremo, ar muito seco ou poluição perigosa #}
+{% if temp < 16 or humidity < 35 or pm25 > 25 or o3 > 150 %}
   critico
-{% elif h < 40 or pm > 15 or t < 18 or h > 70 %}
+{# LÓGICA RUIM: Frio leve, ar seco ou poluição moderada #}
+{% elif temp < 18 or humidity < 45 or pm25 > 12 or o3 > 80 %}
   ruim
 {% else %}
   normal
