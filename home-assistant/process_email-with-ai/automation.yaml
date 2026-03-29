@@ -53,7 +53,7 @@ actions:
                   message: "Conflitos: {{ trigger.json.conflict_details | default('Nenhum') }}"
                   notification_id: ultimo_evento_log
 
-              - action: notify.mobile_app_super_ultra_quiquiphone
+              - action: notify.notify
                 data:
                   title: 📅 {{ trigger.json.subject }}
                   message: |-
@@ -111,7 +111,7 @@ actions:
                       - action: counter.increment
                         target:
                           entity_id: counter.appointments_success
-                      - action: notify.mobile_app_super_ultra_quiquiphone
+                      - action: notify.notify
                         data:
                           message: ✅ Evento criado com sucesso.
                           data: {tag: confirmacao_evento}
@@ -123,7 +123,7 @@ actions:
                       - action: counter.increment
                         target:
                           entity_id: counter.appointments_ignored
-                      - action: notify.mobile_app_super_ultra_quiquiphone
+                      - action: notify.notify
                         data:
                           message: ❌ Evento ignorado.
                           data: {tag: confirmacao_evento}

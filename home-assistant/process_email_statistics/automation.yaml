@@ -20,7 +20,7 @@ actions:
             - counter.appointments_processed
 
       # Notificação Mobile (Interface)
-      - action: notify.mobile_app_super_ultra_quiquiphone
+      - action: notify.notify
         data:
           title: "📅 {{ trigger.json.subject }}"
           message: "De: {{ trigger.json.sender }}\nData: {{ trigger.json.date }}"
