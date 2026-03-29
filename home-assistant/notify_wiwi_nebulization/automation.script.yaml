@@ -1,0 +1,68 @@
+alias: "Cronograma de Nebulização Wiwi"
+trigger:
+  - platform: time
+    at: "06:40:00"
+    id: "manha"
+  - platform: time
+    at: "20:00:00"
+    id: "obrigatoria"
+  - platform: time
+    at: "22:00:00"
+    id: "noite_critica"
+
+condition:
+  - condition: template
+    value_template: >
+      {% set risco = states('sensor.nivel_de_risco_wiwi') | lower %}
+      {% if trigger.id == 'manha' %}
+        {{ risco in ['ruim', 'critico'] }}
+      {% elif trigger.id == 'noite_critica' %}
+        {{ risco == 'critico' }}
+      {% else %}
+        true
+      {% endif %}
+
+action:
+  # 1. Envia Notificação Acionável
+  - action: notify.notify
+    data:
+      title: "🩺 Hora de nebulizar o Wiwi"
+      message: >
+        {% set status = states('sensor.nivel_de_risco_wiwi') | lower %}
+        Status do Ar: 
+        {%- if status == 'normal' %} 🟢 NORMAL
+        {%- elif status == 'ruim' %} 🟡 RUIM
+        {%- elif status == 'critico' %} 🔴 CRÍTICO
+        {%- else %} ⚪ {{ status | upper }}
+        {%- endif %}
+        \n Inicie a sessão de 15 minutos.
+      data:
+        tag: "nebuliza_wiwi"
+        actions:
+          - action: "START_NEB"
+            title: "Iniciar"
+
+  # 2. Espera o clique no botão "Iniciar"
+  - wait_for_trigger:
+      - platform: event
+        event_type: mobile_app_notification_action
+        event_data:
+          action: "START_NEB"
+    timeout: "00:45:00"
+
+  # 3. Ciclo de 15 Minutos
+  - action: notify.notify
+    data:
+      message: "Contador iniciado. 🕒 (15 min)"
+  
+  - delay: "00:15:00"
+
+  # 4. Alerta de Finalização
+  - action: notify.notify
+    data:
+      title: "✅ Sessão Finalizada"
+      message: "Pode tirar o Wiwi da nebulização agora."
+      data:
+        push:
+          sound: "default"
+          critical: 1

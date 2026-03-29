@@ -1,0 +1,13 @@
+alias: "Nível De risco wiwi"
+id: nivel_de_risco_wiwi
+{% set h = states('sensor.umidade_sala') | float(50) %}
+{% set pm = states('sensor.qualidade_ar_pm25') | float(0) %}
+{% set t = states('sensor.temperatura_sala') | float(20) %}
+
+{% if h < 30 or pm > 35 or t < 16 %}
+  critico
+{% elif h < 40 or pm > 15 or t < 18 or h > 70 %}
+  ruim
+{% else %}
+  normal
+{% endif %}
