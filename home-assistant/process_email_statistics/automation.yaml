@@ -1,4 +1,3 @@
-# Caminho sugerido no GitHub: home-assistant/01-appointment-notification/automation.yaml
 alias: "Notificação: Confirmar Evento"
 description: Recebe agendamentos via Webhook com métricas de performance
 triggers:
